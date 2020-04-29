@@ -1,0 +1,35 @@
+From 50869fcb7ad44c5a2cd9de3274d46793ecc143ae Mon Sep 17 00:00:00 2001
+From: Lennart Heim <git@heim.xyz>
+Date: Mon, 2 Mar 2020 10:28:41 +0100
+Subject: [PATCH 1/2] Use wget instead of curl
+
+---
+ tensorflow/lite/tools/make/download_dependencies.sh | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/tensorflow/lite/tools/make/download_dependencies.sh b/tensorflow/lite/tools/make/download_dependencies.sh
+index 25e7d6b789..eaf8f28939 100755
+--- a/tensorflow/lite/tools/make/download_dependencies.sh
++++ b/tensorflow/lite/tools/make/download_dependencies.sh
+@@ -61,12 +61,16 @@ download_and_extract() {
+   echo "downloading ${url}" >&2
+   mkdir -p "${dir}"
+   if [[ "${url}" == *gz ]]; then
+-    curl -Ls "${url}" | tar -C "${dir}" --strip-components=1 -xz
++    # curl -Ls "${url}" | tar -C "${dir}" --strip-components=1 -xz
++    wget -qO- "${url}" | tar xz --strip-components=1 -C "${dir}"
++
+   elif [[ "${url}" == *zip ]]; then
+     tempdir=$(mktemp -d)
+     tempdir2=$(mktemp -d)
+ 
+-    curl -L ${url} > ${tempdir}/zipped.zip
++    # curl -L ${url} > ${tempdir}/zipped.zip
++    wget ${url} -O ${tempdir}/zipped.zip
++
+     unzip ${tempdir}/zipped.zip -d ${tempdir2}
+ 
+     # If the zip file contains nested directories, extract the files from the
+-- 
+2.20.1 (Apple Git-117)
+

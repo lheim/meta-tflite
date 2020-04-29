@@ -1,0 +1,70 @@
+From f477053c27d6d7d300f158cbcc78832bb5057769 Mon Sep 17 00:00:00 2001
+From: Lennart Heim <git@heim.xyz>
+Date: Thu, 5 Mar 2020 12:44:47 +0100
+Subject: [PATCH 2/2] Tailor Makefile to armv7l
+
+---
+ tensorflow/lite/tools/make/Makefile | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
+
+diff --git a/tensorflow/lite/tools/make/Makefile b/tensorflow/lite/tools/make/Makefile
+index f67094f37b..a0675b0393 100644
+--- a/tensorflow/lite/tools/make/Makefile
++++ b/tensorflow/lite/tools/make/Makefile
+@@ -50,7 +50,7 @@ LIBS := \
+ -lstdc++ \
+ -lpthread \
+ -lm \
+--lz
++-ldl
+ 
+ # There are no rules for compiling objects for the host system (since we don't
+ # generate things like the protobuf compiler that require that), so all of
+@@ -207,7 +207,7 @@ BENCHMARK_LIB_SRCS := $(filter-out \
+ # CXXFLAGS or LIBS to work for a specific targetted architecture. All logic
+ # based on platforms or architectures should happen within these files, to
+ # keep this main makefile focused on the sources and dependencies.
+-include $(wildcard $(MAKEFILE_DIR)/targets/*_makefile.inc)
++# include $(wildcard $(MAKEFILE_DIR)/targets/*_makefile.inc)
+ 
+ ALL_SRCS := \
+ 	$(MINIMAL_SRCS) \
+@@ -218,10 +218,10 @@ ALL_SRCS := \
+   $(CMD_LINE_TOOLS_SRCS)
+ 
+ # Where compiled objects are stored.
+-GENDIR := $(MAKEFILE_DIR)/gen/$(TARGET)_$(TARGET_ARCH)/
+-OBJDIR := $(GENDIR)obj/
+-BINDIR := $(GENDIR)bin/
+-LIBDIR := $(GENDIR)lib/
++OBJDIR := $(MAKEFILE_DIR)/gen/obj/
++BINDIR := $(MAKEFILE_DIR)/gen/bin/
++LIBDIR := $(MAKEFILE_DIR)/gen/lib/
++GENDIR := $(MAKEFILE_DIR)/gen/obj/
+ 
+ LIB_PATH := $(LIBDIR)$(LIB_NAME)
+ BENCHMARK_LIB := $(LIBDIR)$(BENCHMARK_LIB_NAME)
+@@ -229,9 +229,10 @@ BENCHMARK_BINARY := $(BINDIR)$(BENCHMARK_BINARY_NAME)
+ BENCHMARK_PERF_OPTIONS_BINARY := $(BINDIR)$(BENCHMARK_PERF_OPTIONS_BINARY_NAME)
+ MINIMAL_BINARY := $(BINDIR)minimal
+ 
+-CXX := $(CC_PREFIX)${TARGET_TOOLCHAIN_PREFIX}g++
+-CC := $(CC_PREFIX)${TARGET_TOOLCHAIN_PREFIX}gcc
+-AR := $(CC_PREFIX)${TARGET_TOOLCHAIN_PREFIX}ar
++CXX ?= $(TOOLCHAIN_PATH)/bin/$(CC_PREFIX)-gcc
++CC ?= $(TOOLCHAIN_PATH)/bin/$(CC_PREFIX)-gcc
++ARFLAGS ?= -r
++AR ?= $(TOOLCHAIN_PATH)/bin/$(CC_PREFIX)-ar
+ 
+ MINIMAL_OBJS := $(addprefix $(OBJDIR), \
+ $(patsubst %.cc,%.o,$(patsubst %.c,%.o,$(MINIMAL_SRCS))))
+@@ -322,4 +323,4 @@ cleantarget:
+ $(DEPDIR)/%.d: ;
+ .PRECIOUS: $(DEPDIR)/%.d
+ 
+--include $(patsubst %,$(DEPDIR)/%.d,$(basename $(ALL_SRCS)))
++-include $(patsubst %,$(DEPDIR)/%.d,$(basename $(ALL_SRCS)))
+\ No newline at end of file
+-- 
+2.20.1 (Apple Git-117)
+
